@@ -9,7 +9,7 @@ var canvas, c;
 
 var gameState = {snakes: {}, apples: {}};
 
-conn = new WebSocket("ws://stepniowski.com:80");
+conn = new WebSocket('ws://' + location.host + '/ws/');
 conn.onclose = function(event) {
     console.log('<<< Connection closed >>>');
 };
