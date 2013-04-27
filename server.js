@@ -42,7 +42,7 @@ function sendNetworkUpdates(clients, state) {
             var client = clients[clientId];
             var ws = client.connection;
             if (ws) {
-                var clientState = Object.create(state);
+                var clientState = state;
                 clientState.lag = client.lag;
                 ws.send(JSON.stringify(clientState), function (error) {
                     if (error) {
