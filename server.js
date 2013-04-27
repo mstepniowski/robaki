@@ -1,6 +1,6 @@
 var game = require('./game.js');
 var WebSocketServer = require('ws').Server;
-var wss = new WebSocketServer({port: 8080, host: '0.0.0.0'});
+var wss = new WebSocketServer({port: 8080});
 
 var KEY = {
     left: 37,
