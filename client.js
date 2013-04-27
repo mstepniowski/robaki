@@ -7,7 +7,8 @@ var KEY = {
 var conn;
 var canvas, c;
 
-var gameState = {snakes: {}, apples: {}};
+var gameState = {snakes: {}, apples: {}, lag: 0};
+var lag = document.getElementById('lag');
 
 conn = new WebSocket('ws://' + location.host + '/ws/');
 conn.onclose = function(event) {
@@ -26,6 +27,7 @@ body.onkeydown = function (event) {
     conn.send(JSON.stringify([Date.now(), event.keyCode]));
     return false;
 };
+
 
 function render() {
     c.clearRect(0, 0, 800, 800);
@@ -51,6 +53,7 @@ function render() {
         apple = gameState.apples[i];
         c.fillRect(apple.x * 10, apple.y * 10, 10, 10);
     }
+    lag.innerText = gameState.lag;
 }
 
 var requestAnimFrame = window.requestAnimationFrame || mozRequestAnimationFrame;

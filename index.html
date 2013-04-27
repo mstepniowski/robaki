@@ -3,11 +3,17 @@
 <head>
 <title>Robaki</title>
 <style>
-    body { margin: 0; background-color: #CCC }
+    body { margin: 0; background-color: #CCC; width: 960px; font-family: Helvetica, Arial, sans-serif; font-size: 14px }
     canvas { background-color: #FFF; position: absolute; top: auto; bottom: auto; left: auto; right: auto; width: 800px; height: 600px }
+    #messages { float: right; width: 140px; padding: 0 10px; }
+    h1 { font-size: 150% }
 </style>
 </head>
 <body>
+    <div id="messages">
+	<h1>Robaki!</h1>
+	<p><b>Lag:</b> <span id="lag">0</span> ms</p>
+    </div>
     <canvas width="800" height="600" id="canvas"></canvas>
 </body>
 <script type="text/javascript" src="game.js"></script>
