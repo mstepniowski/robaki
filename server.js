@@ -42,7 +42,16 @@ function sendNetworkUpdates(clients, state) {
             var client = clients[clientId];
             var ws = client.connection;
             if (ws) {
-                ws.send(JSON.stringify(state));
+                var clientState = Object.create(state);
+                clientState.lag = client.lag;
+                ws.send(JSON.stringify(clientState), function (error) {
+                    if (error) {
+                        game.removeSnake(gameState, client.snake);
+                        if (clients[client.id]) {
+                            delete clients[client.id];
+                        }
+                    }
+                });
             }
         }
     }
@@ -59,14 +68,13 @@ function loop(clients, state) {
     setTimeout(function () { loop(clients, state); }, Math.max(0, 100.0 - timeTaken));
 }
 
-
-
 wss.on('connection', function(ws) {
     var snake = game.addSnake(gameState);
     var client = {id: nextId++,
                   connection: ws,
                   snake: snake,
-                  key: null};
+                  key: null,
+                  lag: 0};
     clients[client.id] = client;
 
     ws.on('message', function(message) {
