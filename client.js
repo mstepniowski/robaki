@@ -7,15 +7,20 @@ var KEY = {
 var conn;
 var canvas, c;
 
-var gameState = {snakes: {}, apples: {}, lag: 0};
-var lag = document.getElementById('lag');
+var gameState = {snakes: {}, apples: {}};
+var pingMessage = document.getElementById('ping-message');
 
 conn = new WebSocket('ws://' + location.host + '/ws/');
 conn.onclose = function(event) {
     console.log('<<< Connection closed >>>');
 };
 conn.onmessage = function(event) {
-    gameState = JSON.parse(event.data);
+    data = JSON.parse(event.data);
+    if (data.event === 'update') {
+        gameState = data.data;
+    } else if (data.event === 'pong') {
+        pingMessage.innerText = Date.now() - data.data;
+    }
 };
 
 canvas = document.getElementById('canvas');
@@ -23,15 +28,27 @@ c = canvas.getContext('2d');
 
 var body = document.getElementsByTagName('body')[0];
 body.onkeydown = function (event) {
-    event.stopPropagation();
-    conn.send(JSON.stringify([Date.now(), event.keyCode]));
-    return false;
+    if (event.keyCode === KEY.up || event.keyCode === KEY.right
+        || event.keyCode === KEY.down || event.keyCode === KEY.left) {
+        event.stopPropagation();
+        conn.send(JSON.stringify({event: 'input',
+                              time: Date.now(),
+                              data: event.keyCode}));
+        return false;
+    }
 };
 
+function ping() {
+    conn.send(JSON.stringify({event: 'ping', data: Date.now()}));
+    setTimeout(ping, 1000);
+}
+
+conn.onopen = function () {
+    ping();
+}
 
 function render() {
     c.clearRect(0, 0, 800, 800);
-    c.fillStyle = '#000000';
     var i, snake, part, apple;
     for (var snakeId in gameState.snakes) {
         if (gameState.snakes.hasOwnProperty(snakeId)) {
@@ -53,7 +70,6 @@ function render() {
         apple = gameState.apples[i];
         c.fillRect(apple.x * 10, apple.y * 10, 10, 10);
     }
-    lag.innerText = gameState.lag;
 }
 
 var requestAnimFrame = window.requestAnimationFrame || mozRequestAnimationFrame;

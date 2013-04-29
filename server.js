@@ -42,9 +42,7 @@ function sendNetworkUpdates(clients, state) {
             var client = clients[clientId];
             var ws = client.connection;
             if (ws) {
-                var clientState = state;
-                clientState.lag = client.lag;
-                ws.send(JSON.stringify(clientState), function (error) {
+                ws.send(JSON.stringify({event: 'update', data: state}), function (error) {
                     if (error) {
                         game.removeSnake(gameState, client.snake);
                         if (clients[client.id]) {
@@ -79,8 +77,11 @@ wss.on('connection', function(ws) {
 
     ws.on('message', function(message) {
         var data = JSON.parse(message);
-        client.lag = Date.now() - data[0];
-        client.key = parseInt(data[1], 10);
+        if (data.event === 'input') {
+            client.key = parseInt(data.data, 10);
+        } else if (data.event === 'ping') {
+            ws.send(JSON.stringify({event: 'pong', data: data.data}), function () {});
+        }
     });
 
     ws.on('close', function () {
@@ -88,7 +89,7 @@ wss.on('connection', function(ws) {
         delete clients[client.id];
     });
 
-    ws.send(JSON.stringify(gameState));
+    ws.send(JSON.stringify({event: 'update', data: gameState}));
 });
 
 loop(clients, gameState);

@@ -1,7 +1,17 @@
 var nextId = 0;
 
+function sortByKey(arr, key) {
+    key = key || function (e) { return e };
+    function cmp(a, b) {
+        var aKey = key(a);
+        var bKey = key(b);
+        return (aKey === bKey) ? 0 : (aKey < bKey) ? -1 : 1;
+    }
+    arr.sort(cmp);
+}
+
 function newGame() {
-    return {snakes: {}, apples: [], width: 80, height: 60, turn: 0};
+    return {snakes: {}, apples: [], width: 80, height: 60, turn: 0, leaderboard: []};
 }
 
 function addSnake(state) {
